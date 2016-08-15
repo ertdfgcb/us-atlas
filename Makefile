@@ -630,10 +630,12 @@ topo/us-counties-10m-ungrouped.json: shp/us/counties.shp
 	mkdir -p $(dir $@)
 	node_modules/.bin/topojson \
 		-o $@ \
+		-e csv/population.csv \
+		-p population=DP0010001,name=COUNTY,state=STATE \
+		--id-property=+FIPS,GEOID10 \
 		--no-pre-quantization \
 		--post-quantization=1e6 \
 		--simplify=7e-7 \
-		--id-property=+FIPS \
 		-- $<
 
 # Group polygons into multipolygons.
@@ -645,6 +647,7 @@ topo/us-%-10m.json: topo/us-%-10m-ungrouped.json
 # Merge counties into states.
 topo/us-states-10m.json: topo/us-counties-10m.json
 	node_modules/.bin/topojson-merge \
+		-p \
 		-o $@ \
 		--in-object=counties \
 		--out-object=states \
